@@ -81,6 +81,8 @@ impl Track {
 async fn main() -> Result<()> {
     dotenv().ok();
 
+    // TODO: http server for localhost:8888/callback
+
     let spotify = init_spotify().await?;
     let mut current_track = Track::new();
 
@@ -118,7 +120,10 @@ async fn get_track_lyrics(t: &Track) -> Result<Option<String>> {
 
     let text = match fragment.select(&elm).last() {
         Some(elm) => match elm.first_child() {
-            Some(node) => Some(node.value().as_text().unwrap().to_string()),
+            Some(node) => match node.value().as_text() {
+                Some(text) => Some(text.to_string()),
+                _ => None,
+            },
             _ => None,
         },
         _ => None,
